@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rlscout"
+version = "1.0.0"
+description = "Read-only, in-scope detector for missing/broken Supabase (PostgREST) RLS."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+# PyYAML is only needed by the Docker integration harness (reads docker-compose.yml).
+dev = ["pytest>=8.0", "PyYAML>=6.0"]
+# Optional bounded-LLM layer (--ai). Pulls in the Anthropic SDK (and pydantic).
+ai = ["anthropic>=0.69"]
+
+[project.scripts]
+rlscout = "rlscout.cli:main"
+
+[tool.setuptools]
+packages = ["rlscout", "rlscout.wordlists"]
+
+[tool.setuptools.package-data]
+"rlscout.wordlists" = ["*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

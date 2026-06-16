@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# RLScout output reports (may reference targets; don't commit by default)
+report.md
+report.json
+*.report.md
+*.report.json
+
+# Integration test artifacts (generated at runtime)
+tests/integration/www/index.html
+tests/integration/_itest_*
+
+# Supabase CLI local state (config.toml/migrations are intentionally tracked)
+supabase/.branches/
+supabase/.temp/
+
+# uv
+# (uv.lock is committed; the venv is not)
+
+# Secrets — real .env is never committed; .env.example is the tracked template
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,41 @@
+# Self-contained, fully-in-scope (localhost) integration backend for RLScout:
+# real Postgres + real PostgREST behind an nginx gateway that mirrors Supabase's
+# /rest/v1/ layout. Brought up/down by run_integration.py.
+#
+# NOTE: PGRST_JWT_SECRET below MUST match JWT_SECRET in run_integration.py.
+name: rlscout-itest
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    volumes:
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  postgrest:
+    image: postgrest/postgrest:v12.2.3
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:authpass@db:5432/app
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_SCHEMAS: public
+      PGRST_JWT_SECRET: "rlscout-itest-super-secret-jwt-key-32+chars"
+
+  gateway:
+    image: nginx:1.27-alpine
+    depends_on:
+      - postgrest
+    ports:
+      - "8088:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./www:/usr/share/nginx/html:ro
